@@ -396,11 +396,16 @@ legacy_firmware_detected:
 
 error:
     lda wic64_status
-    cmp #$03 ; no usable connection
+    cmp #$03 ; WiFi connection lost = reconnect on retry
     bne +
-    +pointer retry_action, connect
 
-+   +wic64_reset_store_instruction
+-   +pointer retry_action, connect
+    jmp ++
+
++   cmp #$04 ; Network error => reconnect on retry
+    beq -
+
+++  +wic64_reset_store_instruction
     +wic64_execute error_request, response
     +jcs timeout
 
