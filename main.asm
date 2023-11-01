@@ -5,6 +5,8 @@ roff = $92
 
 key_f1 = $85
 key_f3 = $86
+key_f5 = $87
+key_f7 = $88
 
 * = $0801 ; 10 SYS 2064 ($0810)
 !byte $0c, $08, $0a, $00, $9e, $20, $32, $30, $36, $34, $00, $00, $00
@@ -154,14 +156,9 @@ main:
 +   sty open_request_size
 
 connect:
+    jsr clear_screen
+
     +pointer retry_action, connect
-
-    +newline
-    +print connecting_text
-    +print open_request_payload
-    +print elipsis_text
-    +newline
-
     +wic64_execute open_request, response, $05
     +jcs timeout
     +jne error
@@ -419,31 +416,28 @@ timeout:
     jmp retry_or_abort
 
 retry_or_abort: !zone retry_or_abort {
-    +plot 40-17, 24
-    +print .retry_or_abort_prompt
+    +plot 40-.prompt_length-2, 24
+    +print .prompt
 
 .scan:
     jsr $ffe4
     beq .scan
 
-    cmp #"A"
+    cmp #key_f3
     bne +
-
-.abort:
-    +close_box
-    jmp main
-
-+   cmp #key_f1
-    beq .abort
-
-    cmp #"R"
-    bne .scan
 
     +close_box
 retry_action = *+1
     jmp read
 
-.retry_or_abort_prompt: !pet "(R)etry/(A)bort?", $00
++   cmp #key_f1
+    bne .scan
+
+    +close_box
+    jmp main
+
+.prompt: !pet $9e, "F1 ", $1c, "Abort ", $9e, "F3 ", $1c, "Retry", $00
+.prompt_length = * - .prompt - 5
 }
 
 init_screen:
@@ -591,8 +585,6 @@ keybindings_text:
 !pet $0d
 !byte $00
 
-connecting_text: !pet "Connecting to ", $00
-elipsis_text: !pet "...", $00
 server_prompt: !pet "server> ", $00
 
 servers:
