@@ -554,19 +554,19 @@ print_server: !zone print_server {
 .index: !byte $00
 }
 
-error_request: !byte "R", $2a, $01, $00, $00
+error_request: !byte "R", WIC64_GET_STATUS_MESSAGE, $01, $00, $00
 
-open_request: !byte "R", $21
+open_request: !byte "R", WIC64_TCP_OPEN
 open_request_size: !byte $00, $00
 open_request_payload: !fill 256, 0
 
-read_request: !byte "R", $22, $00, $00
+read_request: !byte "R", WIC64_TCP_READ, $00, $00
 
-write_request: !byte "R", $23
+write_request: !byte "R", WIC64_TCP_WRITE
 write_request_size: !byte $00, $00
 write_request_payload: !fill 81, 0
 
-close_request !byte "R", $2e, $00, $00
+close_request !byte "R", WIC64_TCP_CLOSE, $00, $00
 
 menu_title: !pet ron, "  -- WiC64 Simple Telnet Client 2.0 --  ", roff, $0d, $00
 
