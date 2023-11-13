@@ -43,13 +43,6 @@ wic64_include_return_to_portal = 1
     sta .pointer+1
 }
 
-!macro inc16 .addr {
-    inc .addr
-    bne .done
-    inc addr+1
-.done
-}
-
 !macro add16 .addr {
     clc
     adc .addr
