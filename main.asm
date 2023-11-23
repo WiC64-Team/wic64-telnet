@@ -14,7 +14,7 @@ key_f7 = $88
 * = $0810
 jmp init
 
-wic64_include_return_to_portal = 1
+wic64_include_enter_portal = 1
 !src "wic64.h"
 !src "wic64.asm"
 
@@ -331,7 +331,7 @@ input_server_and_connect:
     jmp connect
 
 return_to_portal:
-    +wic64_return_to_portal
+    +wic64_enter_portal
     jmp main
 
 jsr_print_character:
