@@ -162,7 +162,7 @@ connect:
     +pointer retry_action, read
 
 read:
-    +wic64_execute read_request, response
+    +wic64_execute read_request
     +jcs timeout
     +jne error
 
@@ -182,7 +182,7 @@ write_character:
     sta write_request_size
 
 write:
-    +wic64_execute write_request, response
+    +wic64_execute write_request
     +jcs timeout
     +jne error
     jmp read
@@ -205,7 +205,7 @@ input_line_and_write:
 
 quit:
     +wic64_reset_store_instruction
-    +wic64_execute close_request, response
+    +wic64_execute close_request
     +jcs timeout
     +jne error
     jmp main
