@@ -587,6 +587,7 @@ servers:
 !pet "rapidfire.hopto.org:64128", $00
 !pet "raveolution.hopto.org:64128", $00
 !pet "8bit.hoyvision.com:6400", $00
+!pet "bbs.retrocampus.com:6510", $00
 !byte $ff
 
 timeout_error: !pet "Transfer timeout", $00
