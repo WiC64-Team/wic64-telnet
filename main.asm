@@ -110,6 +110,9 @@ init:
     +jne legacy_firmware_detected
 
     +wic64_dont_disable_irqs
+
+    +wic64_execute set_transfer_timeout, $05
+    +wic64_execute set_remote_timeout, $05
 main:
     jsr init_screen
     jsr clear_screen
@@ -162,10 +165,11 @@ connect:
     +pointer retry_action, read
 
 read:
-    +wic64_execute read_request
+    +wic64_execute read_request, $05
     +jcs timeout
     +jne error
-
+lda #$03
+sta retry
 scan:
     jsr $ffe4
     beq read
@@ -182,9 +186,11 @@ write_character:
     sta write_request_size
 
 write:
-    +wic64_execute write_request
+    +wic64_execute write_request, $05
     +jcs timeout
     +jne error
+lda #$03
+sta retry
     jmp read
 
 input_line_and_write:
@@ -205,7 +211,7 @@ input_line_and_write:
 
 quit:
     +wic64_reset_store_instruction
-    +wic64_execute close_request
+    +wic64_execute close_request, $05
     +jcs timeout
     +jne error
     jmp main
@@ -396,7 +402,7 @@ error:
     beq -
 
 ++  +wic64_reset_store_instruction
-    +wic64_execute error_request, response
+    +wic64_execute error_request, response, $05
     +jcs timeout
 
     +open_box $02
@@ -404,6 +410,11 @@ error:
     jmp retry_or_abort
 
 timeout:
+   dec retry            ; immer erst 3x automatisch den Wiederverbindungsversuch probieren, bevor die Fehlermeldung erscheint
+   beq +
+;inc $d020
+   jmp ++
++
     +open_box $02
     +print timeout_error
     jmp retry_or_abort
@@ -420,6 +431,7 @@ retry_or_abort: !zone retry_or_abort {
     bne +
 
     +close_box
+++
 retry_action = *+1
     jmp read
 
@@ -547,6 +559,8 @@ print_server: !zone print_server {
 .index: !byte $00
 }
 
+retry: !byte $03
+
 error_request: !byte "R", WIC64_GET_STATUS_MESSAGE, $01, $00, $00
 
 open_request: !byte "R", WIC64_TCP_OPEN
@@ -558,6 +572,9 @@ read_request: !byte "R", WIC64_TCP_READ, $00, $00
 write_request: !byte "R", WIC64_TCP_WRITE
 write_request_size: !byte $00, $00
 write_request_payload: !fill 81, 0
+
+set_transfer_timeout: !byte "R", WIC64_SET_TRANSFER_TIMEOUT, $01, $00, $05
+set_remote_timeout: !byte "R", WIC64_SET_REMOTE_TIMEOUT, $01, $00, $05
 
 close_request !byte "R", WIC64_TCP_CLOSE, $00, $00
 
