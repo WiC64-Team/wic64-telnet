@@ -410,9 +410,8 @@ error:
     jmp retry_or_abort
 
 timeout:
-   dec retry            ; immer erst 3x automatisch den Wiederverbindungsversuch probieren, bevor die Fehlermeldung erscheint
+   dec retry            ; always try to reconnect automatically 3 times before the timeout message appears
    beq +
-;inc $d020
    jmp ++
 +
     +open_box $02
