@@ -396,12 +396,13 @@ error:
     bne +
 
 -   +pointer retry_action, connect
-    jmp ++
+    jmp error2
 
 +   cmp #$04 ; Network error => reconnect on retry
     beq -
 
-++  +wic64_reset_store_instruction
+error2:
+    +wic64_reset_store_instruction
     +wic64_execute error_request, response, $05
     +jcs timeout
 
@@ -412,7 +413,7 @@ error:
 timeout:
    dec retry            ; always try to reconnect automatically 3 times before the timeout message appears
    beq +
-   jmp ++
+   jmp timeout_retry
 +
     +open_box $02
     +print timeout_error
@@ -430,7 +431,8 @@ retry_or_abort: !zone retry_or_abort {
     bne +
 
     +close_box
-++
+
+timeout_retry
 retry_action = *+1
     jmp read
 
